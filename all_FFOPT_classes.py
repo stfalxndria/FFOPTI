@@ -2193,7 +2193,7 @@ class single_loss_calc:
         d_folder = self.d_folder
         
         # Look inside D_folder/ for F*D* folders
-        f_folders = [f for f in glob.glob(os.path.join(d_folder, 'F*D*')) if os.path.isdir(f)]
+        f_folders = [f for f in glob.glob(os.path.join(d_folder, f'F*D*')) if os.path.isdir(f)]
         f_folders.sort(key=lambda x: int(re.search(r'F(\d+)D(\d+)', os.path.basename(x)).group(1)))  # sort by frame
         
         for f_folder in f_folders:

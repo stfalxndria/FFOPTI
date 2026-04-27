@@ -133,7 +133,7 @@ print(f'{len(missing_param_loss)} missing from backup file')
 for a in missing_param_loss:
     d_folder = f'{GMX_ref_path}/D{a}'
     single_calc_tools = single_loss_calc(Structure_name,Structure, DFT_ref_path,d_folder)
-    new_loss = single_calc_tools.average_type_loss_per_D()
+    new_loss = single_calc_tools.average_type_loss_per_D(metrics="MAPE")
     average_loss = average_loss.join(new_loss)
 
 print('loss obtained')
@@ -201,8 +201,9 @@ for a in range(max_iter - starting_step):
     total_loss_per_iter = average_loss.sum(axis=0)
     best_iter = total_loss_per_iter.idxmin()
     current_iter = len(average_loss.columns) - 1
-    if current_iter - int(best_iter) <= 100:
-        print('starting epoch:',len(average_loss))
+    print(current_iter, best_iter)
+    if current_iter - int(best_iter) <= 200:
+        print('starting epoch:',len(param))
         ########################
         #Setting up data for BO
         ########################
@@ -290,14 +291,18 @@ for a in range(max_iter - starting_step):
         # 4. Define and fit the GP model with an improved kernel
         # Added a WhiteKernel to account for noise in the GROMACS simulations
         #kernel = C(1.0) * Matern(length_scale=1.0, nu=1.5) + WhiteKernel(noise_level=1e-5)
+        #kernel = C(1.0, (1e-3, 1e4)) * Matern(
+            #length_scale=np.ones(feature_length),          # 8 features in X_train
+            #length_scale_bounds=(1e-2, 1e2),  # optimizer can tune each scale
+            #nu=2.5                            # smoothness of function
+        #) + WhiteKernel(noise_level=1e-5)
         kernel = C(1.0, (1e-3, 1e4)) * Matern(
             length_scale=np.ones(feature_length),          # 8 features in X_train
             length_scale_bounds=(1e-2, 1e2),  # optimizer can tune each scale
             nu=2.5                            # smoothness of function
-        ) + WhiteKernel(noise_level=1e-5)
-                        
-        gp = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=10,random_state=42)
-        #gp = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=10, alpha=1e-6, normalize_y=True, random_state=42)
+        )          
+        #gp = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=10,random_state=42)
+        gp = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=10, alpha=1e-6, normalize_y=True, random_state=42)
         gp.fit(X_scaled, y_scaled)
          
         # 5. When predicting the next sample, remember to scale the input
@@ -317,7 +322,7 @@ for a in range(max_iter - starting_step):
         
         print("Learned kernel:", gp.kernel_)
     
-        ACQ_FUNC = expected_improvement
+        ACQ_FUNC = log_expected_improvement
         # Direction of optimisation
         def min_obj(X):
             return -ACQ_FUNC(X.reshape(1, -1), gp, np.min(y_train)) #use this if just the average
@@ -450,6 +455,11 @@ for a in range(max_iter - starting_step):
         #calculating the loss for the new output
         d_folder = f'{GMX_ref_path}/{new_D}'
         single_calc_tools = single_loss_calc(Structure_name,Structure, DFT_ref_path,d_folder)
-        new_loss = single_calc_tools.average_type_loss_per_D()
+        new_loss = single_calc_tools.average_type_loss_per_D(metrics="MAPE")
         average_loss = average_loss.join(new_loss)
         average_loss.to_pickle(f"{GMX_ref_path}/ffopti_backup/param_type_loss.pkl")
+
+    else:
+        print('no further improvement')
+        break
+        
