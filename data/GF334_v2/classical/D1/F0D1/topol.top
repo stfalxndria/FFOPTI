@@ -1,0 +1,8 @@
+#include "force_field.itp"
+#include "MOF.itp" 
+
+[ system ]
+MOF		
+
+[ molecules ]
+MOF	1

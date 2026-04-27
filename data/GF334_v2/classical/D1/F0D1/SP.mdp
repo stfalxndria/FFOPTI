@@ -1,0 +1,39 @@
+integrator               = md ; leap-frog
+tinit     = 0
+dt	  = 0.001		; 1 fs
+nsteps	  = 0   		; 1 μs
+
+nstxout		= 1		; save coordinates
+nstvout		= 1			; save velocities
+nstenergy	= 1		; save energies
+nstlog		= 1		; update log
+nstfout         = 1
+
+cutoff-scheme = Verlet       ; pair list with buffering
+nstlist       = 10            ; Frequency to update the neighbor list
+ns-type       = grid         ; Make a grid in the box and only check atoms in neighboring grid cells
+pbc           = xyz          ; Periodic boundary conditions in all directions
+rlist		= 1.2		; Neighbor list search cut-off distance (nm)
+rcoulomb	= 1.2		; Short-range Coulombic interactions cut-off distance (nm)
+rvdw		= 1.2		; Short-range van der Waals cutoff distance (nm)
+DispCorr	= EnerPres	; Dispersion correction accounts for cut-off vdW scheme
+periodic-molecules       = yes
+
+coulombtype	    = PME	; Particle Mesh Ewald for long-range electrostatics
+pme_order	    = 4		; cubic interpolation
+fourierspacing	    = 0.12	; grid spacing for FFT
+
+tcoupl = nose-hoover
+tc-grps                  = system   ; mention the residue names if wanted multiple thermostats
+tau_t                    = 0.2 ;mention tau_t as many time as number of residues in tc-grps
+ref_t                    = 298 ; reference temperature
+
+pcoupl		= no
+
+continuation	        = no
+
+gen_vel		= yes ;
+gen-temp                 = 298
+gen-seed                 = -1
+
+constraints = none
