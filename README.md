@@ -13,6 +13,8 @@
 - UPDATE: It is compulsory to provide an inital primary force_field.itp (at least 1). This file will be used to create limits for the parameters to ensure that the parameters are wirhin a physically reasonable range.
 
 # How it works
-- A single point energy calculations will be done with the coordinates provided by DFT reference data to compute the loss of the forces. 
+- A single point energy calculations will be done with the coordinates provided by DFT reference data to compute the loss of the forces.
+- Bayesian Optimisation is used to optimise the parameters with the X_train data being the parameters being optimised and the Y_train is the computed loss of the forces.
 - The optimiser will then be able to predict a new parameter, which will the be used to calculate the loss of the forces on each atom.
-- After a certain threshold, you will have the option to stop running Single Point classical energy calculations, and instead use a surrogate model to predict the loss for the predicted parameters.
+- The Bayesian Optimisation loop will stop once it reaches the set *max_iterations* or it has not seen any improvements in the last *loss_limit* iterations.
+
