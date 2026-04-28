@@ -1,4 +1,4 @@
-# ML Force Field Optimisation
+# ML Force Field Optimisation (BETA)
 
 **FFOPTI** is a python package for optimising flexible force fields of structures automatically using machine learning methods paired with GROMACS or LAMMPS software
 **FFOPTI** also have built in functions that can be used to extract connectivity in atoms and assign UFF force fields for classical MD without optimisation (see: class About_Structure)
